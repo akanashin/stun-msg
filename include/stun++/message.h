@@ -774,15 +774,15 @@ class base_message {
     return iterator(hdr(), NULL);
   }
 
- private:
-  std::vector<uint8_t, Allocator> buffer_;
-
   stun_msg_hdr *hdr() {
     return reinterpret_cast<stun_msg_hdr*>(buffer_.data());
   }
   const stun_msg_hdr *hdr() const {
     return reinterpret_cast<const stun_msg_hdr*>(buffer_.data());
   }
+  
+ private:
+  std::vector<uint8_t, Allocator> buffer_;
 };
 
 template<class Allocator>
@@ -933,15 +933,20 @@ class message_piece {
     return iterator(hdr(), NULL);
   }
 
- private:
-  const uint8_t *ptr_;
-  size_t length_;
-
   const stun_msg_hdr *hdr() const {
     return reinterpret_cast<const stun_msg_hdr*>(ptr_);
   }
+
+ private:
+  const uint8_t *ptr_;
+  size_t length_;
 };
 
+template<typename MSG_T>
+message create_response(const MSG_T& src_msg, uint16_t type)
+{
+    return message(type, src_msg.hdr()->tsx_id);
+}
 } // namespace stun
 
 #endif // STUNXX_MESSAGE_H_
